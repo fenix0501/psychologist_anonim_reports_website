@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Админ-панель - Школа без Буллинга</title>
+    <style>
+        body { 
+            font-family: 'Segoe UI', sans-serif; 
+            background: #f0f2f5; 
+            margin: 0; 
+            padding: 20px; 
+        }
+        .container { 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            background: white; 
+            padding: 20px; 
+            border-radius: 12px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
+        }
+        h1 { 
+            color: #333; 
+            text-align: center; 
+            margin-bottom: 30px;
+        }
+        .kanban-board {
+            display: flex;
+            gap: 20px;
+            overflow-x: auto;
+        }
+        .column {
+            min-width: 300px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+        }
+        .column-header {
+            font-weight: bold;
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 6px;
+            text-align: center;
+        }
+        .new { background: #e3f2fd; }
+        .in-progress { background: #fff3e0; }
+        .resolved { background: #e8f5e9; }
+        .ticket-card {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .ticket-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .ticket-priority-high { border-left: 5px solid #f44336; }
+        .ticket-priority-medium { border-left: 5px solid #ff9800; }
+        .ticket-priority-low { border-left: 5px solid #4caf50; }
+        .ticket-category {
+            font-size: 0.8em;
+            padding: 3px 8px;
+            border-radius: 12px;
+            margin-top: 8px;
+            display: inline-block;
+        }
+        .category-suicide, .category-threat { background: #ffcdd2; color: #c62828; }
+        .category-violence, .category-cyberbullying { background: #ffe0b2; color: #ef6c00; }
+        .category-isolation, .category-insults { background: #c8e6c9; color: #2e7d32; }
+        .category-other { background: #e0e0e0; color: #424242; }
+        .filters {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        select, input {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .chat-container {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+        }
+        .chat-box {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80%;
+            max-width: 600px;
+            height: 80%;
+            max-height: 700px;
+            background: white;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+        }
+        .chat-header {
+            padding: 15px;
+            background: #4CAF50;
+            color: white;
+            border-radius: 12px 12px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .chat-messages {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .message {
+            max-width: 70%;
+            padding: 10px 15px;
+            border-radius: 18px;
+            margin-bottom: 10px;
+        }
+        .student-message {
+            align-self: flex-start;
+            background: #e3f2fd;
+            border-bottom-left-radius: 5px;
+        }
+        .psychologist-message {
+            align-self: flex-end;
+            background: #f3e5f5;
+            border-bottom-right-radius: 5px;
+        }
+        .chat-input-area {
+            padding: 15px;
+            border-top: 1px solid #eee;
+            display: flex;
+            gap: 10px;
+        }
+        .chat-input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+        }
+        .chat-send-btn {
+            padding: 10px 20px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+        .status-controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .status-btn {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9em;
+        }
+        .btn-new { background: #e3f2fd; color: #1565c0; }
+        .btn-in-progress { background: #fff3e0; color: #f57c00; }
+        .btn-resolved { background: #e8f5e9; color: #2e7d32; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🛡️ Админ-панель психолога</h1>
+
+        <div style="text-align: center; margin-bottom: 20px;">
+            <a href="/" style="display: inline-block; margin: 0 10px; padding: 8px 16px; background: #4CAF50; color: white; text-decoration: none; border-radius: 4px;">Главная</a>
+            <a href="/about" style="display: inline-block; margin: 0 10px; padding: 8px 16px; background: #2196F3; color: white; text-decoration: none; border-radius: 4px;">О проекте</a>
+            <a href="/resources" style="display: inline-block; margin: 0 10px; padding: 8px 16px; background: #FF9800; color: white; text-decoration: none; border-radius: 4px;">Ресурсы</a>
+            <a href="/contact" style="display: inline-block; margin: 0 10px; padding: 8px 16px; background: #9C27B0; color: white; text-decoration: none; border-radius: 4px;">Контакты</a>
+            <button onclick="logout()" style="display: inline-block; margin: 0 10px; padding: 8px 16px; background: #f44336; color: white; text-decoration: none; border-radius: 4px; border: none; cursor: pointer;">Выйти</button>
+        </div>
+
+        <!-- Tabs for different views -->
+        <div style="margin-bottom: 20px;">
+            <button id="tickets-tab" class="tab-button active" onclick="switchTab('tickets')">Обращения</button>
+            <button id="messages-tab" class="tab-button" onclick="switchTab('messages')">Все сообщения</button>
+        </div>
+
+        <!-- Tickets View -->
+        <div id="tickets-view">
+        
+        <div class="filters">
+            <div class="filter-group">
+                <label for="status-filter">Статус:</label>
+                <select id="status-filter">
+                    <option value="">Все</option>
+                    <option value="new">Новые</option>
+                    <option value="in_progress">В работе</option>
+                    <option value="resolved">Решенные</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label for="priority-filter">Приоритет:</label>
+                <select id="priority-filter">
+                    <option value="">Все</option>
+                    <option value="low">Низкий</option>
+                    <option value="medium">Средний</option>
+                    <option value="high">Высокий</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label for="category-filter">Категория:</label>
+                <select id="category-filter">
+                    <option value="">Все</option>
+                    <option value="suicide">Суицидальные мысли</option>
+                    <option value="violence">Физическое насилие</option>
+                    <option value="insults">Оскорбления</option>
+                    <option value="cyberbullying">Кибербуллинг</option>
+                    <option value="isolation">Изоляция</option>
+                    <option value="threat">Угрозы</option>
+                    <option value="other">Другое</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="kanban-board">
+            <div class="column">
+                <div class="column-header new">Новые</div>
+                <div id="new-column" class="tickets-list"></div>
+            </div>
+            
+            <div class="column">
+                <div class="column-header in-progress">В работе</div>
+                <div id="in-progress-column" class="tickets-list"></div>
+            </div>
+            
+            <div class="column">
+                <div class="column-header resolved">Решено</div>
+                <div id="resolved-column" class="tickets-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Messages View -->
+    <div id="messages-view" style="display: none;">
+        <h2>Все сообщения учеников</h2>
+        <div class="filters">
+            <div class="filter-group">
+                <label for="role-filter">Роль:</label>
+                <select id="role-filter">
+                    <option value="">Все</option>
+                    <option value="student">Ученик</option>
+                    <option value="psychologist">Психолог</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="message-status-filter">Статус обращения:</label>
+                <select id="message-status-filter">
+                    <option value="">Все</option>
+                    <option value="new">Новые</option>
+                    <option value="in_progress">В работе</option>
+                    <option value="resolved">Решенные</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="message-category-filter">Категория:</label>
+                <select id="message-category-filter">
+                    <option value="">Все</option>
+                    <option value="suicide">Суицидальные мысли</option>
+                    <option value="violence">Физическое насилие</option>
+                    <option value="insults">Оскорбления</option>
+                    <option value="cyberbullying">Кибербуллинг</option>
+                    <option value="isolation">Изоляция</option>
+                    <option value="threat">Угрозы</option>
+                    <option value="other">Другое</option>
+                </select>
+            </div>
+        </div>
+        <div id="messages-list" style="margin-top: 20px;"></div>
+    </div>
+
+    <!-- Chat Modal -->
+    <div class="chat-container" id="chat-modal">
+        <div class="chat-box">
+            <div class="chat-header">
+                <span id="chat-title">Чат с учеником</span>
+                <button onclick="closeChat()" style="background: none; border: none; color: white; font-size: 1.5em;">×</button>
+            </div>
+            <div class="chat-messages" id="chat-messages">
+                <!-- Messages will be loaded here -->
+            </div>
+            <div class="chat-input-area">
+                <input type="text" class="chat-input" id="chat-input" placeholder="Введите сообщение...">
+                <button class="chat-send-btn" onclick="sendMessage()">Отправить</button>
+            </div>
+            <div class="status-controls">
+                <button class="status-btn btn-new" onclick="changeStatus('new')">Новый</button>
+                <button class="status-btn btn-in-progress" onclick="changeStatus('in_progress')">В работе</button>
+                <button class="status-btn btn-resolved" onclick="changeStatus('resolved')">Решено</button>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .tab-button {
+            padding: 10px 20px;
+            background: #e0e0e0;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px 4px 0 0;
+            margin-right: 5px;
+        }
+        .tab-button.active {
+            background: #4CAF50;
+            color: white;
+        }
+        .message-item {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .message-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #eee;
+        }
+        .message-tags {
+            margin-top: 10px;
+        }
+        .message-tag {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            margin-right: 5px;
+            font-size: 0.8em;
+        }
+        .tag-suicide, .tag-threat { background: #ffcdd2; color: #c62828; }
+        .tag-violence, .tag-cyberbullying { background: #ffe0b2; color: #ef6c00; }
+        .tag-isolation, .tag-insults { background: #c8e6c9; color: #2e7d32; }
+        .tag-other { background: #e0e0e0; color: #424242; }
+    </style>
+
+    <script>
+        let currentTicketId = null;
+
+        // Load tickets on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadTickets();
+
+            // Add event listeners to filters
+            document.getElementById('status-filter').addEventListener('change', loadTickets);
+            document.getElementById('priority-filter').addEventListener('change', loadTickets);
+            document.getElementById('category-filter').addEventListener('change', loadTickets);
+            
+            // Add event listeners to message filters
+            document.getElementById('role-filter').addEventListener('change', loadMessages);
+            document.getElementById('message-status-filter').addEventListener('change', loadMessages);
+            document.getElementById('message-category-filter').addEventListener('change', loadMessages);
+        });
+
+        function switchTab(tabName) {
+            // Hide all views
+            document.getElementById('tickets-view').style.display = 'none';
+            document.getElementById('messages-view').style.display = 'none';
+            
+            // Remove active class from all buttons
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            if (tabName === 'tickets') {
+                document.getElementById('tickets-view').style.display = 'block';
+                document.getElementById('tickets-tab').classList.add('active');
+            } else if (tabName === 'messages') {
+                document.getElementById('messages-view').style.display = 'block';
+                document.getElementById('messages-tab').classList.add('active');
+                loadMessages(); // Load messages when switching to messages tab
+            }
+        }
+
+        async function loadTickets() {
+            const statusFilter = document.getElementById('status-filter').value;
+            const priorityFilter = document.getElementById('priority-filter').value;
+            const categoryFilter = document.getElementById('category-filter').value;
+
+            let url = `/api/admin/tickets`;
+            const params = new URLSearchParams();
+            if (statusFilter) params.append('status', statusFilter);
+            if (priorityFilter) params.append('priority', priorityFilter);
+            if (categoryFilter) params.append('category', categoryFilter);
+
+            if ([...params.keys()].length > 0) {
+                url += '?' + params.toString();
+            }
+
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+
+                // Clear columns
+                document.getElementById('new-column').innerHTML = '';
+                document.getElementById('in-progress-column').innerHTML = '';
+                document.getElementById('resolved-column').innerHTML = '';
+
+                // Populate columns based on status
+                data.tickets.forEach(ticket => {
+                    const card = createTicketCard(ticket);
+
+                    if (ticket.status === 'new') {
+                        document.getElementById('new-column').appendChild(card);
+                    } else if (ticket.status === 'in_progress') {
+                        document.getElementById('in-progress-column').appendChild(card);
+                    } else if (ticket.status === 'resolved') {
+                        document.getElementById('resolved-column').appendChild(card);
+                    }
+                });
+            } catch (error) {
+                console.error('Error loading tickets:', error);
+            }
+        }
+
+        function createTicketCard(ticket) {
+            const div = document.createElement('div');
+            div.className = `ticket-card ticket-priority-${ticket.priority}`;
+            div.onclick = () => openChat(ticket.id);
+
+            // Format date
+            const date = new Date(ticket.created_at);
+            const formattedDate = date.toLocaleDateString();
+
+            // Get category label
+            const categoryLabels = {
+                'suicide': 'Суицидальные мысли',
+                'violence': 'Физическое насилие',
+                'insults': 'Оскорбления',
+                'cyberbullying': 'Кибербуллинг',
+                'isolation': 'Изоляция',
+                'threat': 'Угрозы',
+                'other': 'Другое'
+            };
+            const categoryLabel = categoryLabels[ticket.category] || ticket.category;
+
+            div.innerHTML = `
+                <div><strong>ID: ${ticket.id}</strong></div>
+                <div>${ticket.text_preview}</div>
+                <div class="ticket-category category-${ticket.category}">${categoryLabel}</div>
+                <div style="font-size: 0.9em; color: #666; margin-top: 8px;">${formattedDate}</div>
+                <div style="margin-top: 8px;">
+                    <span style="padding: 2px 8px; background: #e0e0e0; border-radius: 12px; font-size: 0.8em;">
+                        ${ticket.priority.toUpperCase()}
+                    </span>
+                </div>
+            `;
+
+            return div;
+        }
+
+        async function openChat(ticketId) {
+            currentTicketId = ticketId;
+
+            try {
+                const response = await fetch(`/api/admin/tickets/${ticketId}/chat`);
+                const data = await response.json();
+
+                document.getElementById('chat-title').textContent = `Чат по обращению #${ticketId}`;
+
+                const messagesContainer = document.getElementById('chat-messages');
+                messagesContainer.innerHTML = '';
+
+                data.messages.forEach(msg => {
+                    const messageDiv = document.createElement('div');
+                    messageDiv.className = `message ${msg.role}-message`;
+                    messageDiv.textContent = msg.text;
+                    messagesContainer.appendChild(messageDiv);
+                });
+
+                // Scroll to bottom
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+                document.getElementById('chat-modal').style.display = 'block';
+            } catch (error) {
+                console.error('Error loading chat:', error);
+            }
+        }
+
+        function closeChat() {
+            document.getElementById('chat-modal').style.display = 'none';
+            currentTicketId = null;
+        }
+
+        async function sendMessage() {
+            if (!currentTicketId) return;
+
+            const input = document.getElementById('chat-input');
+            const message = input.value.trim();
+
+            if (!message) return;
+
+            try {
+                const response = await fetch(`/api/admin/tickets/${currentTicketId}/chat`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        token: '', // Token not needed for admin
+                        message: message
+                    })
+                });
+
+                if (response.ok) {
+                    // Reload chat to show new message
+                    openChat(currentTicketId);
+                    input.value = '';
+                } else {
+                    alert('Ошибка при отправке сообщения');
+                }
+            } catch (error) {
+                console.error('Error sending message:', error);
+            }
+        }
+
+        async function changeStatus(newStatus) {
+            if (!currentTicketId) return;
+
+            try {
+                const response = await fetch(`/api/admin/tickets/${currentTicketId}/status`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        status: newStatus
+                    })
+                });
+
+                if (response.ok) {
+                    // Reload tickets to reflect status change
+                    loadTickets();
+                    // Reload chat to update header if needed
+                    openChat(currentTicketId);
+                } else {
+                    alert('Ошибка при изменении статуса');
+                }
+            } catch (error) {
+                console.error('Error changing status:', error);
+            }
+        }
+
+        // Allow sending message with Enter key
+        document.getElementById('chat-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        async function loadMessages() {
+            const roleFilter = document.getElementById('role-filter').value;
+            const statusFilter = document.getElementById('message-status-filter').value;
+            const categoryFilter = document.getElementById('message-category-filter').value;
+
+            let url = `/api/admin/messages`;
+            const params = new URLSearchParams();
+            if (roleFilter) params.append('role', roleFilter);
+            if (statusFilter) params.append('status', statusFilter);
+            if (categoryFilter) params.append('category', categoryFilter);
+
+            if ([...params.keys()].length > 0) {
+                url += '?' + params.toString();
+            }
+
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+
+                const messagesContainer = document.getElementById('messages-list');
+                messagesContainer.innerHTML = '';
+
+                data.messages.forEach(message => {
+                    const messageElement = createMessageItem(message);
+                    messagesContainer.appendChild(messageElement);
+                });
+            } catch (error) {
+                console.error('Error loading messages:', error);
+            }
+        }
+
+        function createMessageItem(message) {
+            const div = document.createElement('div');
+            div.className = 'message-item';
+
+            // Format date
+            const date = new Date(message.timestamp);
+            const formattedDate = date.toLocaleString();
+
+            // Get role label
+            const roleLabels = {
+                'student': 'Ученик',
+                'psychologist': 'Психолог'
+            };
+            const roleLabel = roleLabels[message.role] || message.role;
+
+            // Get category label
+            const categoryLabels = {
+                'suicide': 'Суицидальные мысли',
+                'violence': 'Физическое насилие',
+                'insults': 'Оскорбления',
+                'cyberbullying': 'Кибербуллинг',
+                'isolation': 'Изоляция',
+                'threat': 'Угрозы',
+                'other': 'Другое'
+            };
+            const categoryLabel = categoryLabels[message.ticket_category] || message.ticket_category;
+
+            // Get status label
+            const statusLabels = {
+                'new': 'Новое',
+                'in_progress': 'В работе',
+                'resolved': 'Решено'
+            };
+            const statusLabel = statusLabels[message.ticket_status] || message.ticket_status;
+
+            // Create tags HTML
+            let tagsHtml = '';
+            if (message.tags && message.tags.length > 0) {
+                tagsHtml = '<div class="message-tags">';
+                message.tags.forEach(tag => {
+                    tagsHtml += `<span class="message-tag tag-${tag.tag_name}">${tag.tag_name} (${(tag.probability * 100).toFixed(1)}%)</span>`;
+                });
+                tagsHtml += '</div>';
+            }
+
+            div.innerHTML = `
+                <div class="message-header">
+                    <div>
+                        <strong>Обращение #${message.ticket_id}</strong> | 
+                        Роль: ${roleLabel} | 
+                        Категория: ${categoryLabel || 'N/A'} | 
+                        Статус: ${statusLabel || 'N/A'}
+                    </div>
+                    <div>${formattedDate}</div>
+                </div>
+                <div>${message.text}</div>
+                ${tagsHtml}
+            `;
+
+            return div;
+        }
+
+        async function logout() {
+            try {
+                await fetch('/api/admin/logout', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                // Redirect to login page
+                window.location.href = '/login';
+            } catch (error) {
+                console.error('Error logging out:', error);
+                // Even if API fails, redirect to login
+                window.location.href = '/login';
+            }
+        }
+    </script>
+</body>
+</html>

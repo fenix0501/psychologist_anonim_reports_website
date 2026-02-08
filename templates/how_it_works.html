@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Как это работает - Школа без Буллинга</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #f0f2f5;
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 20px;
+            color: #4CAF50;
+        }
+        h2 {
+            color: #555;
+            border-bottom: 2px solid #4CAF50;
+            padding-bottom: 5px;
+            margin-top: 25px;
+        }
+        .step {
+            display: flex;
+            margin: 25px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #4CAF50;
+        }
+        .step-number {
+            background: #4CAF50;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+        .step-content h3 {
+            margin: 0 0 8px 0;
+            color: #333;
+        }
+        .process-diagram {
+            display: flex;
+            justify-content: space-between;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+        .process-step {
+            text-align: center;
+            flex: 1;
+            min-width: 150px;
+            padding: 10px;
+        }
+        .process-step .icon {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+        .arrow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .arrow::after {
+            content: "→";
+            font-size: 1.5em;
+            color: #4CAF50;
+        }
+        .security-info {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .nav-links {
+            text-align: center;
+            margin: 30px 0;
+        }
+        .nav-links a {
+            display: inline-block;
+            margin: 0 10px;
+            padding: 10px 20px;
+            background: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            transition: background 0.3s;
+        }
+        .nav-links a:hover {
+            background: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🛡️ Как работает система</h1>
+        
+        <p>Наша система обеспечивает анонимную и безопасную связь между учениками и профессиональными психологами. Вот как это работает:</p>
+
+        <div class="process-diagram">
+            <div class="process-step">
+                <div class="icon">📝</div>
+                <div>Сообщение</div>
+            </div>
+            <div class="arrow"></div>
+            <div class="process-step">
+                <div class="icon">🧠</div>
+                <div>Анализ ИИ</div>
+            </div>
+            <div class="arrow"></div>
+            <div class="process-step">
+                <div class="icon">📋</div>
+                <div>Обработка</div>
+            </div>
+            <div class="arrow"></div>
+            <div class="process-step">
+                <div class="icon">💬</div>
+                <div>Чат</div>
+            </div>
+        </div>
+
+        <div class="step">
+            <div class="step-number">1</div>
+            <div class="step-content">
+                <h3>Отправка сообщения</h3>
+                <p>Ученик анонимно отправляет сообщение о ситуации, с которой он столкнулся. Сообщение может содержать описание буллинга, угроз, насилия или других проблем.</p>
+            </div>
+        </div>
+
+        <div class="step">
+            <div class="step-number">2</div>
+            <div class="step-content">
+                <h3>Автоматический анализ</h3>
+                <p>Наша система машинного обучения анализирует текст сообщения, определяет категорию проблемы и уровень риска. Это позволяет быстро приоритизировать обращения.</p>
+            </div>
+        </div>
+
+        <div class="step">
+            <div class="step-number">3</div>
+            <div class="step-content">
+                <h3>Создание обращения</h3>
+                <p>Система создаёт уникальное обращение с присвоенным приоритетом (низкий, средний, высокий) в зависимости от серьёзности ситуации. Высокоприоритетные случаи получают немедленное внимание.</p>
+            </div>
+        </div>
+
+        <div class="step">
+            <div class="step-number">4</div>
+            <div class="step-content">
+                <h3>Получение токена</h3>
+                <p>Ученик получает уникальный токен, который позволяет ему вернуться к обращению и продолжить общение с психологом. Токен гарантирует анонимность и безопасность.</p>
+            </div>
+        </div>
+
+        <div class="step">
+            <div class="step-number">5</div>
+            <div class="step-content">
+                <h3>Общение с психологом</h3>
+                <p>Квалифицированный психолог отвечает на обращение и начинает анонимный диалог с учеником. Диалог продолжается до тех пор, пока проблема не будет решена.</p>
+            </div>
+        </div>
+
+        <div class="security-info">
+            <h3>Безопасность и конфиденциальность</h3>
+            <p>Мы уделяем особое внимание защите личной информации. Все данные зашифрованы, а идентичность ученика никогда не раскрывается. Мы соблюдаем строгие стандарты конфиденциальности и не передаём информацию третьим лицам.</p>
+        </div>
+
+        <h2>Технологии, которые мы используем</h2>
+        <p>Наша система использует передовые технологии машинного обучения для автоматической классификации обращений:</p>
+        <ul>
+            <li><strong>TF-IDF векторизация:</strong> Для преобразования текста в числовые признаки</li>
+            <li><strong>LightGBM модель:</strong> Для точной классификации типов буллинга</li>
+            <li><strong>Нейросетевые алгоритмы:</strong> Для определения уровня риска и приоритета</li>
+            <li><strong>Автоматическая маршрутизация:</strong> Для направления обращений нужным специалистам</li>
+        </ul>
+
+        <div class="nav-links">
+            <a href="/">Главная</a>
+            <a href="/about">О проекте</a>
+            <a href="/contact">Контакты</a>
+            <a href="/faq">FAQ</a>
+        </div>
+    </div>
+</body>
+</html>

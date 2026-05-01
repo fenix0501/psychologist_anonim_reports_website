@@ -74,10 +74,11 @@
             text-decoration: none;
         }
     </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='theme.css') }}">
 </head>
 <body>
     <div class="login-container">
-        <h1>🔐 Вход в систему психолога</h1>
+        <h1>Вход в систему психолога</h1>
         <form id="login-form">
             <div class="form-group">
                 <label for="username">Имя пользователя:</label>
@@ -93,7 +94,7 @@
             Неверные учетные данные. Пожалуйста, попробуйте снова.
         </div>
         <div class="back-link">
-            <a href="/">← На главную</a>
+            <a href="/">На главную</a>
         </div>
     </div>
 
@@ -119,12 +120,10 @@
                 const data = await response.json();
                 
                 if (data.success) {
-                    // Store user info in session/local storage
                     sessionStorage.setItem('isLoggedIn', 'true');
                     sessionStorage.setItem('username', data.username);
                     sessionStorage.setItem('userId', data.user_id);
                     
-                    // Redirect to admin panel
                     window.location.href = '/admin';
                 } else {
                     document.getElementById('error-message').style.display = 'block';

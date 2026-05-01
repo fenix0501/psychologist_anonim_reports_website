@@ -107,15 +107,16 @@
             background: #45a049;
         }
     </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='theme.css') }}">
 </head>
 <body>
     <div class="container">
-        <h1>📞 Контакты и поддержка</h1>
+        <h1>Контакты и поддержка</h1>
         
         <p>Если у вас есть вопросы, предложения или вам нужна помощь, вы можете связаться с нами любым удобным способом:</p>
 
         <div class="emergency">
-            <h3>🚨 Экстренная помощь</h3>
+            <h3>Экстренная помощь</h3>
             <p>Если вы или кто-то, кого вы знаете, находится в опасности, немедленно обратитесь за помощью:</p>
             <p><strong>Телефон доверия:</strong> 8-800-2000-122 (круглосуточно, бесплатно)</p>
             <p><strong>Скорая помощь:</strong> 103 или 112</p>
@@ -123,21 +124,21 @@
 
         <div class="contact-methods">
             <div class="contact-card">
-                <div class="contact-icon">📧</div>
+                <div class="contact-icon"></div>
                 <h3>Email</h3>
                 <p>support@antibullying.ru</p>
                 <p>Мы ответим в течение 24 часов</p>
             </div>
             
             <div class="contact-card">
-                <div class="contact-icon">💬</div>
+                <div class="contact-icon"></div>
                 <h3>Чат поддержки</h3>
                 <p>Онлайн через сайт</p>
                 <p>Рабочие дни: 9:00-18:00</p>
             </div>
             
             <div class="contact-card">
-                <div class="contact-icon">🏢</div>
+                <div class="contact-icon"></div>
                 <h3>Офис</h3>
                 <p>г. Москва, ул. Примерная, д. 123</p>
                 <p>Пн-Пт: 9:00-18:00</p>
@@ -198,17 +199,13 @@
         document.getElementById('contact-form').addEventListener('submit', function(e) {
             e.preventDefault();
             
-            // Get form values
             const name = document.getElementById('name').value;
             const email = document.getElementById('email').value;
             const subject = document.getElementById('subject').value;
             const message = document.getElementById('message').value;
             
-            // In a real implementation, you would send this data to the server
-            // For now, we'll just show an alert
             alert(`Спасибо за ваше сообщение, ${name}! Мы свяжемся с вами по адресу ${email} в ближайшее время.`);
             
-            // Reset form
             this.reset();
         });
     </script>

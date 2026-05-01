@@ -90,10 +90,11 @@
         .status-in-progress { background: #fff3e0; color: #f57c00; }
         .status-resolved { background: #e8f5e9; color: #2e7d32; }
     </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='theme.css') }}">
 </head>
 <body>
     <div class="container">
-        <h1>💬 Чат с психологом</h1>
+        <h1>Чат с психологом</h1>
         
         <div class="token-display">
             Ваш токен: <strong id="token-display">Загрузка...</strong>
@@ -101,7 +102,6 @@
         
         <div class="chat-container">
             <div class="chat-messages" id="chat-messages">
-                <!-- Messages will be loaded here -->
             </div>
             <div class="chat-input-area">
                 <input type="text" class="chat-input" id="chat-input" placeholder="Введите ваше сообщение...">
@@ -122,11 +122,9 @@
     </div>
 
     <script>
-        // Get token from URL
         const urlParams = new URLSearchParams(window.location.search);
         let token = urlParams.get('token');
 
-        // Also check if token is passed as a route parameter (e.g., /chat/abc123)
         if (!token) {
             const pathParts = window.location.pathname.split('/');
             if (pathParts.length > 2) {
@@ -177,10 +175,8 @@
                         messagesContainer.appendChild(messageDiv);
                     });
 
-                    // Scroll to bottom
                     messagesContainer.scrollTop = messagesContainer.scrollHeight;
 
-                    // Update status indicator
                     updateStatusIndicator();
                 } else {
                     document.getElementById('chat-messages').innerHTML = '<div>' + data.detail + '</div>';
@@ -210,9 +206,7 @@
                 });
 
                 if (response.ok) {
-                    // Reload chat to show the new message
                     loadChatHistory();
-                    // Clear input
                     input.value = '';
                 } else {
                     const errorData = await response.json();
@@ -225,13 +219,10 @@
         }
         
         function updateStatusIndicator() {
-            // In a real implementation, we would fetch the actual status
-            // For now, we'll just show a generic status
             document.getElementById('status-indicator').textContent = 'В обработке';
             document.getElementById('status-indicator').className = 'status-indicator status-in-progress';
         }
         
-        // Allow sending message with Enter key
         document.getElementById('chat-input').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 sendMessage();
